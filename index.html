@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#06090f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Planetek BD">
+<title>Planetek BD — Africa & Middle East</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════
+   TOKENS
+═══════════════════════════════════ */
+:root{
+  --bg:#06090f;
+  --c1:#0b1020;
+  --c2:#101828;
+  --c3:#162035;
+  --c4:#1d2a42;
+  --b1:#1d2a42;
+  --b2:#2a3d58;
+  --africa:#00e5aa;
+  --africa-soft:rgba(0,229,170,.12);
+  --me:#f59e0b;
+  --me-soft:rgba(245,158,11,.12);
+  --accent:#00e5aa;
+  --accent-soft:rgba(0,229,170,.12);
+  --tx:#ccdaf0;
+  --tx2:#7a93b4;
+  --tx3:#3d5570;
+  --green:#22c55e;
+  --red:#ef4444;
+  --blue:#3b82f6;
+  --purple:#8b5cf6;
+  --orange:#f59e0b;
+  --hw:60px;
+  --sw:220px;
+}
+[data-region="me"]{--accent:#f59e0b;--accent-soft:rgba(245,158,11,.12);}
+[data-region="africa"]{--accent:#00e5aa;--accent-soft:rgba(0,229,170,.12);}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Space Grotesk',sans-serif;
+  background:var(--bg);color:var(--tx);
+  min-height:100vh;font-size:14px;overflow-x:hidden;
+}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 70% 50% at 85% 0%,rgba(0,229,170,.05) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 40% at 5% 95%,rgba(245,158,11,.04) 0%,transparent 55%);
+}
+
+/* ═══ SYNC BAR ═══ */
+.sync-bar{position:fixed;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--accent),transparent);
+  z-index:999;transform:scaleX(0);transform-origin:left;
+  opacity:0;transition:all .4s;}
+.sync-bar.go{transform:scaleX(1);opacity:1;}
+
+/* ═══ SETUP SCREEN ═══ */
+.setup{
+  position:fixed;inset:0;background:var(--bg);z-index:800;
+  display:flex;align-items:center;justify-content:center;padding:20px;
+}
+.setup-box{
+  background:var(--c1);border:1px solid var(--b2);border-radius:20px;
+  padding:36px;width:100%;max-width:440px;
+}
+.setup-logo{display:flex;align-items:center;gap:12px;margin-bottom:28px;}
+.setup-mark{
+  width:42px;height:42px;border-radius:10px;
+  background:linear-gradient(135deg,#00e5aa,#3b82f6);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:18px;color:#06090f;flex-shrink:0;
+}
+.setup-name{font-size:17px;font-weight:700;}
+.setup-caption{font-size:11px;color:var(--tx3);margin-top:2px;letter-spacing:.06em;text-transform:uppercase;}
+.setup-label{font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;margin-top:20px;}
+.setup-who{display:flex;gap:8px;}
+.who-btn{
+  flex:1;padding:14px 8px;border:2px solid var(--b1);border-radius:12px;
+  background:transparent;color:var(--tx2);cursor:pointer;
+  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;
+  transition:all .2s;text-align:center;line-height:1.4;
+}
+.who-btn:hover{border-color:var(--b2);color:var(--tx);}
+.who-btn.on-g{border-color:var(--africa);color:var(--africa);background:var(--africa-soft);}
+.who-btn.on-a{border-color:var(--blue);color:var(--blue);background:rgba(59,130,246,.12);}
+.setup-input{
+  width:100%;padding:11px 14px;
+  background:var(--c2);border:1px solid var(--b1);border-radius:10px;
+  color:var(--tx);font-family:'Space Grotesk',sans-serif;font-size:13px;
+  outline:none;transition:border-color .2s;margin-bottom:8px;
+}
+.setup-input:focus{border-color:var(--accent);}
+.setup-hint{font-size:11px;color:var(--tx3);line-height:1.7;}
+.setup-hint a{color:var(--accent);text-decoration:none;}
+.setup-err{color:var(--red);font-size:12px;margin-top:8px;display:none;}
+.setup-launch{
+  width:100%;margin-top:22px;padding:14px;
+  background:var(--accent);color:#06090f;border:none;border-radius:12px;
+  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;
+  cursor:pointer;transition:all .2s;
+}
+.setup-launch:hover{filter:brightness(1.08);}
+.setup-skip{
+  display:block;text-align:center;margin-top:12px;
+  background:none;border:none;color:var(--tx3);font-size:12px;
+  cursor:pointer;font-family:'Space Grotesk',sans-serif;
+}
+.setup-skip:hover{color:var(--tx2);}
+
+/* ═══ APP SHELL ═══ */
+.app{display:flex;flex-direction:column;min-height:100vh;position:relative;z-index:1;}
+
+/* ═══ TOPBAR ═══ */
+.topbar{
+  height:var(--hw);background:rgba(6,9,15,.95);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--b1);
+  display:flex;align-items:center;padding:0 20px;gap:14px;
+  position:sticky;top:0;z-index:300;flex-shrink:0;
+}
+.tb-logo{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.tb-mark{
+  width:32px;height:32px;border-radius:8px;
+  background:linear-gradient(135deg,#00e5aa,#3b82f6);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:13px;color:#06090f;
+}
+.tb-name{font-weight:700;font-size:13px;}
+.tb-sub{font-size:10px;color:var(--tx3);letter-spacing:.07em;text-transform:uppercase;margin-top:1px;}
+.tb-center{flex:1;display:flex;justify-content:center;}
+.region-sw{display:flex;background:var(--c2);border:1px solid var(--b1);border-radius:10px;padding:3px;gap:3px;}
+.rsw-b{
+  padding:6px 18px;border:none;border-radius:7px;cursor:pointer;
+  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:11px;
+  letter-spacing:.05em;text-transform:uppercase;
+  transition:all .2s;background:transparent;color:var(--tx3);
+}
+.rsw-b.on{color:#06090f;}
+.rsw-b[data-r="africa"].on{background:var(--africa);}
+.rsw-b[data-r="me"].on{background:var(--me);}
+.tb-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.user-pill{
+  display:flex;align-items:center;gap:7px;
+  background:var(--c2);border:1px solid var(--b1);border-radius:8px;
+  padding:6px 12px;cursor:pointer;transition:border-color .2s;font-size:12px;font-weight:600;
+}
+.user-pill:hover{border-color:var(--b2);}
+.udot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.udot.live{background:var(--green);animation:blink 2s infinite;}
+.udot.off{background:var(--tx3);}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.35;}}
+.hbg{display:none;background:none;border:1px solid var(--b1);color:var(--tx2);border-radius:7px;padding:7px 9px;cursor:pointer;font-size:14px;line-height:1;}
+
+/* ═══ BODY ═══ */
+.body{display:flex;flex:1;min-height:0;}
+.sb-veil{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;backdrop-filter:blur(2px);}
+.sb-veil.on{display:block;}
+
+/* ═══ SIDEBAR ═══ */
+.sidebar{
+  width:var(--sw);background:var(--c1);border-right:1px solid var(--b1);
+  display:flex;flex-direction:column;
+  position:sticky;top:var(--hw);height:calc(100vh - var(--hw));
+  overflow-y:auto;flex-shrink:0;transition:transform .25s;
+}
+.sb-group{padding:14px 10px 4px;}
+.sb-grp-lbl{font-size:10px;font-weight:700;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;padding:0 6px 6px;}
+.nav-btn{
+  display:flex;align-items:center;gap:9px;
+  padding:9px 12px;border-radius:8px;border:none;
+  background:transparent;color:var(--tx2);cursor:pointer;
+  font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:500;
+  width:100%;text-align:left;transition:all .15s;margin-bottom:2px;
+}
+.nav-btn:hover{background:var(--c2);color:var(--tx);}
+.nav-btn.on{background:var(--accent-soft);color:var(--accent);font-weight:600;}
+.nav-ico{font-size:14px;width:18px;text-align:center;flex-shrink:0;}
+.nav-lbl{flex:1;}
+.nav-cnt{background:var(--c3);border-radius:8px;padding:1px 7px;font-size:11px;font-weight:700;color:var(--tx3);}
+.nav-btn.on .nav-cnt{background:var(--accent-soft);color:var(--accent);}
+.sb-hr{height:1px;background:var(--b1);margin:6px 10px;}
+.sb-foot{margin-top:auto;padding:14px;font-size:11px;color:var(--tx3);text-align:center;}
+
+/* ═══ CONTENT ═══ */
+.content{flex:1;overflow-x:hidden;min-width:0;}
+.page{display:none;padding:24px;max-width:1280px;}
+.page.on{display:block;}
+
+/* PAGE HEAD */
+.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px;flex-wrap:wrap;}
+.ph-title{font-size:22px;font-weight:700;display:flex;align-items:center;gap:10px;}
+.ph-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.rpill{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.07em;text-transform:uppercase;}
+.rpill-a{background:var(--africa-soft);color:var(--africa);}
+.rpill-m{background:var(--me-soft);color:var(--me);}
+
+/* ═══ BUTTONS ═══ */
+.btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 15px;border-radius:8px;border:none;cursor:pointer;
+  font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;
+  transition:all .18s;white-space:nowrap;
+}
+.btn-p{background:var(--accent);color:#06090f;}
+.btn-p:hover{filter:brightness(1.08);}
+.btn-o{background:transparent;color:var(--tx2);border:1px solid var(--b1);}
+.btn-o:hover{border-color:var(--b2);color:var(--tx);}
+.btn-g{background:transparent;color:var(--tx3);border:none;}
+.btn-g:hover{color:var(--tx2);}
+.btn-d{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.2);}
+.btn-d:hover{background:rgba(239,68,68,.2);}
+.btn-sm{padding:5px 11px;font-size:12px;border-radius:7px;}
+.btn-ico{padding:6px;width:30px;height:30px;justify-content:center;}
+.fsel{
+  padding:6px 10px;background:var(--c2);border:1px solid var(--b1);
+  border-radius:7px;color:var(--tx2);font-size:12px;outline:none;
+  font-family:'Space Grotesk',sans-serif;transition:border-color .2s;
+}
+.fsel:focus{border-color:var(--accent);}
+
+/* ═══ KPI GRID — FIXED 4 COLUMNS ═══ */
+.kpi-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;margin-bottom:24px;
+}
+.kpi{
+  background:var(--c1);border:1px solid var(--b1);border-radius:14px;
+  padding:18px;position:relative;overflow:hidden;
+  display:flex;flex-direction:column;gap:6px;
+  transition:border-color .2s,transform .18s;cursor:default;
+}
+.kpi:hover{border-color:var(--b2);transform:translateY(-2px);}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent);}
+.kpi-ico{font-size:20px;line-height:1;}
+.kpi-val{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:26px;line-height:1;color:var(--tx);}
+.kpi-lbl{font-size:11px;color:var(--tx3);font-weight:500;}
+.kpi-sub{font-size:10px;color:var(--tx3);}
+
+/* ═══ CARD ═══ */
+.card{background:var(--c1);border:1px solid var(--b1);border-radius:14px;overflow:hidden;margin-bottom:18px;}
+.card-h{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--b1);gap:10px;flex-wrap:wrap;}
+.card-t{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;}
+.tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;min-width:460px;}
+thead{background:var(--c2);}
+th{padding:10px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--tx3);letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid var(--b1);white-space:nowrap;}
+td{padding:12px 14px;border-bottom:1px solid var(--b1);font-size:13px;vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(255,255,255,.01);}
+.td-act{display:flex;gap:5px;align-items:center;}
+.erow td{text-align:center;color:var(--tx3);padding:30px;font-style:italic;font-size:13px;}
+
+/* ═══ BADGES ═══ */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;white-space:nowrap;}
+.b-green{background:rgba(34,197,94,.13);color:var(--green);}
+.b-blue{background:rgba(59,130,246,.13);color:var(--blue);}
+.b-purple{background:rgba(139,92,246,.13);color:var(--purple);}
+.b-orange{background:rgba(245,158,11,.13);color:var(--orange);}
+.b-red{background:rgba(239,68,68,.13);color:var(--red);}
+.b-muted{background:var(--c3);color:var(--tx3);}
+.b-africa{background:var(--africa-soft);color:var(--africa);}
+.b-me{background:var(--me-soft);color:var(--me);}
+
+/* ═══ OVERVIEW GRID ═══ */
+.ov-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.ov-full{grid-column:1/-1;}
+
+/* ═══ TODO ═══ */
+.todo-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.todo-list{display:flex;flex-direction:column;}
+.todo-item{display:flex;align-items:flex-start;gap:11px;padding:13px 16px;border-bottom:1px solid var(--b1);transition:background .15s;}
+.todo-item:last-child{border-bottom:none;}
+.todo-item:hover{background:rgba(255,255,255,.01);}
+.tcb{
+  width:17px;height:17px;border-radius:50%;border:2px solid var(--b2);
+  background:none;cursor:pointer;flex-shrink:0;margin-top:2px;
+  appearance:none;-webkit-appearance:none;transition:all .15s;
+}
+.tcb:checked{background:var(--green);border-color:var(--green);}
+.t-body{flex:1;min-width:0;}
+.t-title{font-size:13px;font-weight:500;margin-bottom:4px;line-height:1.4;}
+.t-title.done{text-decoration:line-through;opacity:.4;}
+.t-meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+.t-due{font-size:11px;color:var(--orange);}
+.t-due.late{color:var(--red);}
+.t-note{font-size:11px;color:var(--tx3);margin-top:3px;line-height:1.4;}
+.t-right{display:flex;align-items:center;gap:5px;flex-shrink:0;}
+.av{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;font-size:10px;font-weight:700;flex-shrink:0;}
+.av-g{background:rgba(0,229,170,.2);color:var(--africa);}
+.av-a{background:rgba(59,130,246,.2);color:var(--blue);}
+
+/* ═══ KANBAN ═══ */
+.kanban{display:grid;grid-template-columns:repeat(5,minmax(150px,1fr));gap:10px;margin-bottom:18px;overflow-x:auto;padding-bottom:4px;}
+.k-col{background:var(--c1);border:1px solid var(--b1);border-radius:12px;overflow:hidden;}
+.k-col-h{padding:10px 12px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;}
+.k-stage{font-size:11px;font-weight:700;color:var(--tx2);letter-spacing:.06em;text-transform:uppercase;}
+.k-cnt{background:var(--c3);border-radius:8px;padding:1px 7px;font-size:11px;font-weight:700;color:var(--tx3);}
+.k-cards{padding:8px;display:flex;flex-direction:column;gap:6px;min-height:50px;}
+.k-card{background:var(--c2);border:1px solid var(--b1);border-radius:8px;padding:10px 11px;transition:border-color .15s;}
+.k-card:hover{border-color:var(--b2);}
+.k-card-name{font-size:12px;font-weight:600;margin-bottom:2px;line-height:1.3;}
+.k-card-inst{font-size:11px;color:var(--tx3);margin-bottom:3px;}
+.k-card-val{font-size:12px;font-weight:700;color:var(--accent);font-family:'JetBrains Mono',monospace;}
+.k-card-next{font-size:10px;color:var(--tx3);margin-top:3px;line-height:1.3;}
+
+/* ═══ GOALS ═══ */
+.goals-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:18px;}
+.goal-card{background:var(--c1);border:1px solid var(--b1);border-radius:14px;padding:18px;transition:border-color .2s;}
+.goal-card:hover{border-color:var(--b2);}
+.goal-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
+.goal-lbl{font-size:13px;font-weight:500;line-height:1.3;}
+.goal-nums{text-align:right;}
+.goal-cur{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:22px;line-height:1;}
+.goal-tgt{font-size:11px;color:var(--tx3);}
+.pb{height:5px;background:var(--c3);border-radius:3px;overflow:hidden;}
+.pbf{height:100%;border-radius:3px;background:var(--accent);transition:width .5s ease;}
+.goal-pct{font-size:11px;color:var(--tx3);margin-top:5px;}
+
+/* ═══ TIMELINE ═══ */
+.tl-item{display:flex;gap:14px;padding:12px 18px;border-bottom:1px solid var(--b1);align-items:flex-start;}
+.tl-item:last-child{border-bottom:none;}
+.tl-date{font-size:11px;color:var(--tx3);white-space:nowrap;padding-top:2px;min-width:72px;font-family:'JetBrains Mono',monospace;}
+.tl-dot{width:8px;height:8px;border-radius:50%;margin-top:4px;flex-shrink:0;}
+.tl-name{font-size:13px;font-weight:500;}
+.tl-sub{font-size:11px;color:var(--tx3);}
+
+/* ═══ AI ═══ */
+.ai-box{background:var(--c1);border:1px solid var(--b1);border-radius:14px;overflow:hidden;margin-bottom:18px;}
+.ai-h{padding:16px 18px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:12px;}
+.ai-orb{width:36px;height:36px;border-radius:10px;flex-shrink:0;background:linear-gradient(135deg,#6366f1,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:16px;}
+.ai-title{font-size:14px;font-weight:700;}
+.ai-sub{font-size:11px;color:var(--tx3);margin-top:1px;}
+.ai-body{padding:16px 18px;}
+.ai-key-row{display:flex;gap:8px;margin-bottom:8px;}
+.ai-key-row input{flex:1;}
+.ai-status{font-size:12px;color:var(--tx3);margin-bottom:12px;}
+.ai-chat{background:var(--c2);border-radius:10px;padding:14px;min-height:100px;max-height:260px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;}
+.ai-ph{text-align:center;color:var(--tx3);font-size:12px;padding:16px 0;}
+.ai-msg{padding:9px 12px;border-radius:8px;font-size:13px;line-height:1.5;}
+.ai-msg.u{background:var(--c3);align-self:flex-end;max-width:85%;}
+.ai-msg.b{background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);max-width:90%;}
+.ai-input-row{display:flex;gap:8px;margin-top:10px;}
+.ai-input-row input{flex:1;}
+.ai-locked{opacity:.4;pointer-events:none;}
+
+/* ═══ MODAL ═══ */
+.overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.75);
+  backdrop-filter:blur(6px);z-index:500;
+  display:flex;align-items:center;justify-content:center;padding:14px;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.overlay.on{opacity:1;pointer-events:all;}
+.modal{
+  background:var(--c1);border:1px solid var(--b2);border-radius:16px;
+  width:100%;max-width:500px;max-height:92vh;overflow-y:auto;
+  transform:translateY(16px);transition:transform .2s;
+}
+.overlay.on .modal{transform:translateY(0);}
+.modal-h{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 20px 14px;border-bottom:1px solid var(--b1);
+  position:sticky;top:0;background:var(--c1);z-index:1;
+}
+.modal-title{font-size:15px;font-weight:700;}
+.modal-x{
+  background:var(--c2);border:1px solid var(--b1);border-radius:6px;
+  color:var(--tx2);cursor:pointer;padding:5px 9px;font-size:14px;line-height:1;
+  transition:all .15s;
+}
+.modal-x:hover{color:var(--tx);border-color:var(--b2);}
+.modal-body{padding:18px 20px;}
+.modal-foot{padding:12px 20px 18px;display:flex;justify-content:flex-end;gap:8px;}
+.fg{margin-bottom:14px;}
+.fg label{display:block;font-size:11px;font-weight:700;color:var(--tx2);margin-bottom:5px;letter-spacing:.05em;text-transform:uppercase;}
+.fg input,.fg select,.fg textarea{
+  width:100%;padding:10px 13px;
+  background:var(--c2);border:1px solid var(--b1);border-radius:8px;
+  color:var(--tx);font-family:'Space Grotesk',sans-serif;font-size:13px;
+  outline:none;transition:border-color .15s;
+}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--accent);}
+.fg select option{background:var(--c2);}
+.fg textarea{resize:vertical;min-height:68px;line-height:1.5;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+/* ═══ PRINT ═══ */
+@media print{
+  .topbar,.sidebar,.hbg,.sb-veil,.btn,.td-act,.t-right,.overlay,.toast-wrap,.sync-bar,.setup{display:none!important;}
+  body{background:#fff!important;color:#000!important;}
+  .app,.body,.content{display:block!important;}
+  .page{display:none!important;padding:0!important;}
+  .page.print-now{display:block!important;}
+  .card,.kpi,.goal-card{background:#f8f9fa!important;border:1px solid #ddd!important;}
+  .kpi-val,.goal-cur,.ph-title,.card-t{color:#000!important;}
+  .kpi-lbl,.kpi-sub,.goal-lbl,.goal-pct,.t-note{color:#555!important;}
+  .kanban{grid-template-columns:repeat(3,1fr)!important;}
+  .ov-grid,.todo-cols{grid-template-columns:1fr 1fr!important;}
+  table{min-width:0!important;}
+  th,td{color:#000!important;border-color:#ddd!important;}
+  thead{background:#eee!important;}
+  .print-hdr{display:block!important;}
+}
+.print-hdr{display:none;padding:14px 0 12px;border-bottom:2px solid #000;margin-bottom:16px;}
+.print-hdr h1{font-size:17px;font-weight:700;}
+.print-hdr p{font-size:12px;color:#555;margin-top:3px;}
+
+/* ═══ TOAST ═══ */
+.toast-wrap{position:fixed;bottom:18px;right:18px;z-index:600;display:flex;flex-direction:column;gap:7px;}
+.toast{
+  background:var(--c2);border:1px solid var(--b2);border-radius:10px;
+  padding:11px 16px;font-size:13px;max-width:280px;
+  animation:tIn .25s ease;display:flex;align-items:center;gap:8px;
+}
+@keyframes tIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+
+/* ═══ RESPONSIVE ═══ */
+@media(max-width:1100px){
+  .kpi-grid{grid-template-columns:repeat(4,1fr);}
+}
+@media(max-width:900px){
+  .ov-grid{grid-template-columns:1fr;}
+  .kanban{grid-template-columns:repeat(3,minmax(140px,1fr));}
+  .kpi-grid{grid-template-columns:repeat(4,1fr);}
+}
+@media(max-width:640px){
+  :root{--hw:54px;--sw:240px;}
+  .topbar{padding:0 12px;gap:8px;}
+  .tb-name,.tb-sub{display:none;}
+  .hbg{display:flex;align-items:center;justify-content:center;}
+  .sidebar{position:fixed;top:var(--hw);left:0;bottom:0;z-index:250;transform:translateX(-100%);box-shadow:4px 0 24px rgba(0,0,0,.5);height:calc(100vh - var(--hw));}
+  .sidebar.open{transform:translateX(0);}
+  .content{width:100%;}
+  .page{padding:14px;}
+  .kpi-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
+  .ov-grid{grid-template-columns:1fr;}
+  .todo-cols{grid-template-columns:1fr;}
+  .goals-grid{grid-template-columns:1fr;}
+  .kanban{grid-template-columns:repeat(2,minmax(130px,1fr));}
+  .frow{grid-template-columns:1fr;}
+  table{min-width:400px;}
+  .ph-title{font-size:17px;}
+}
+@media(max-width:380px){
+  .kpi-grid{grid-template-columns:repeat(2,1fr);}
+  .kpi-val{font-size:22px;}
+}
+
+/* UTILS */
+.fw6{font-weight:600;}.fw7{font-weight:700;}
+.tx2{color:var(--tx2);}.tx3{color:var(--tx3);}
+.trunc{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.divider{height:1px;background:var(--b1);margin:16px 0;}
+</style>
+</head>
+<body data-region="africa">
+
+<!-- SYNC BAR -->
+<div class="sync-bar" id="sync-bar"></div>
+
+<!-- ══════════ SETUP SCREEN ══════════ -->
+<div class="setup" id="setup">
+  <div class="setup-box">
+    <div class="setup-logo">
+      <div class="setup-mark">P</div>
+      <div>
+        <div class="setup-name">Planetek BD Dashboard</div>
+        <div class="setup-caption">Africa & Middle East · Setup</div>
+      </div>
+    </div>
+
+    <div class="setup-label">1 — Who are you?</div>
+    <div class="setup-who">
+      <button class="who-btn" data-w="Gamal" onclick="pickWho('Gamal')">
+        <div style="font-size:24px;margin-bottom:5px">👤</div>
+        Gamal
+        <div style="font-size:10px;font-weight:400;color:var(--tx3);margin-top:3px">BD Manager</div>
+      </button>
+      <button class="who-btn" data-w="Ahmed" onclick="pickWho('Ahmed')">
+        <div style="font-size:24px;margin-bottom:5px">👤</div>
+        Ahmed
+        <div style="font-size:10px;font-weight:400;color:var(--tx3);margin-top:3px">BD Specialist</div>
+      </button>
+    </div>
+
+    <div class="setup-label" style="margin-top:20px">2 — Firebase Database URL</div>
+    <input class="setup-input" id="fb-url"
+      placeholder="https://planetek-bd-xxxxx-default-rtdb.europe-west1.firebasedatabase.app">
+    <div class="setup-hint">
+      Get this from
+      <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a>
+      → your project → <strong>Realtime Database</strong> → copy the URL at the top of the page.
+      It looks like the placeholder above.
+    </div>
+    <div class="setup-err" id="setup-err">⚠ Please select who you are and paste your Firebase URL.</div>
+
+    <button class="setup-launch" onclick="doSetup()">Launch Dashboard →</button>
+    <button class="setup-skip" onclick="doSkip()">Skip — use offline mode (no sync with Ahmed)</button>
+  </div>
+</div>
+
+<!-- ══════════ MAIN APP ══════════ -->
+<div class="app" id="app" style="display:none">
+
+  <header class="topbar">
+    <div class="tb-logo">
+      <div class="tb-mark">P</div>
+      <div>
+        <div class="tb-name">Planetek Italia</div>
+        <div class="tb-sub">BD · Africa & ME</div>
+      </div>
+    </div>
+    <div class="tb-center">
+      <div class="region-sw">
+        <button class="rsw-b on" data-r="africa" onclick="setRegion('africa')">🌍 Africa</button>
+        <button class="rsw-b" data-r="me" onclick="setRegion('me')">🌙 Middle East</button>
+      </div>
+    </div>
+    <div class="tb-right">
+      <div class="user-pill" onclick="switchUser()" title="Switch user">
+        <span class="udot off" id="u-dot"></span>
+        <span id="u-who">Gamal</span>
+        <span style="color:var(--tx3);font-size:10px">▾</span>
+      </div>
+      <button class="hbg" onclick="toggleSB()">☰</button>
+    </div>
+  </header>
+
+  <div class="body">
+    <div class="sb-veil" id="sb-veil" onclick="closeSB()"></div>
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sb-group">
+        <div class="sb-grp-lbl">Dashboard</div>
+        <button class="nav-btn on" onclick="go('overview')"><span class="nav-ico">◎</span><span class="nav-lbl">Overview</span></button>
+        <button class="nav-btn" onclick="go('events')"><span class="nav-ico">📍</span><span class="nav-lbl">Events</span><span class="nav-cnt" id="nc-ev">0</span></button>
+        <button class="nav-btn" onclick="go('institutions')"><span class="nav-ico">🏛</span><span class="nav-lbl">Institutions</span><span class="nav-cnt" id="nc-in">0</span></button>
+        <button class="nav-btn" onclick="go('pipeline')"><span class="nav-ico">◈</span><span class="nav-lbl">Pipeline</span><span class="nav-cnt" id="nc-pp">0</span></button>
+      </div>
+      <div class="sb-hr"></div>
+      <div class="sb-group">
+        <div class="sb-grp-lbl">Tasks</div>
+        <button class="nav-btn" onclick="go('todos')"><span class="nav-ico">✓</span><span class="nav-lbl">To-Do List</span><span class="nav-cnt" id="nc-td">0</span></button>
+      </div>
+      <div class="sb-hr"></div>
+      <div class="sb-group">
+        <div class="sb-grp-lbl">Planning</div>
+        <button class="nav-btn" onclick="go('goals')"><span class="nav-ico">◉</span><span class="nav-lbl">Goals 2026</span></button>
+        <button class="nav-btn" onclick="go('timeline')"><span class="nav-ico">↗</span><span class="nav-lbl">Timeline</span></button>
+      </div>
+      <div class="sb-hr"></div>
+      <div class="sb-group">
+        <div class="sb-grp-lbl">Tools</div>
+        <button class="nav-btn" onclick="go('ai')"><span class="nav-ico">✦</span><span class="nav-lbl">AI Assistant</span></button>
+        <button class="nav-btn" onclick="doExport()"><span class="nav-ico">↓</span><span class="nav-lbl">Export Report</span></button>
+      </div>
+      <div class="sb-foot" id="sb-status">● Offline</div>
+    </aside>
+
+    <main class="content">
+
+      <!-- OVERVIEW -->
+      <div class="page on" id="page-overview">
+        <div class="print-hdr">
+          <h1>Planetek BD Report — <span id="pr-region">Africa</span></h1>
+          <p id="pr-date"></p>
+        </div>
+        <div class="ph">
+          <div class="ph-title">Overview <span class="rpill rpill-a" id="ov-pill">Africa</span></div>
+          <div class="ph-actions">
+            <button class="btn btn-o btn-sm" onclick="doExport()">↓ Export</button>
+          </div>
+        </div>
+        <div class="kpi-grid" id="kpi-grid"></div>
+        <div class="ov-grid">
+          <div class="card">
+            <div class="card-h"><div class="card-t">📍 Recent Events</div><button class="btn btn-g btn-sm" onclick="go('events')">See all →</button></div>
+            <div class="tscroll"><table><thead><tr><th>Event</th><th>Country</th><th>Date</th></tr></thead><tbody id="ov-ev-body"></tbody></table></div>
+          </div>
+          <div class="card">
+            <div class="card-h"><div class="card-t">🏛 Institutions</div><button class="btn btn-g btn-sm" onclick="go('institutions')">See all →</button></div>
+            <div class="tscroll"><table><thead><tr><th>Name</th><th>Country</th><th>Status</th></tr></thead><tbody id="ov-in-body"></tbody></table></div>
+          </div>
+          <div class="card ov-full">
+            <div class="card-h">
+              <div class="card-t">✓ My Open Tasks <span class="badge b-africa" id="ov-who-badge">Gamal</span></div>
+              <button class="btn btn-g btn-sm" onclick="go('todos')">See all →</button>
+            </div>
+            <div class="todo-list" id="ov-todo-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EVENTS -->
+      <div class="page" id="page-events">
+        <div class="ph">
+          <div class="ph-title">Events <span class="rpill rpill-a" id="ev-pill">Africa</span></div>
+          <div class="ph-actions">
+            <select class="fsel" id="ev-yr-f" onchange="renderEvents()">
+              <option value="">All Years</option>
+              <option value="2025">2025</option>
+              <option value="2026">2026</option>
+            </select>
+            <button class="btn btn-p" onclick="openMod('event')">+ Add Event</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><div class="card-t">All Events</div></div>
+          <div class="tscroll"><table><thead><tr><th>Event</th><th>Country</th><th>Date</th><th>Role</th><th>Contacts</th><th>Notes</th><th></th></tr></thead><tbody id="ev-body"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- INSTITUTIONS -->
+      <div class="page" id="page-institutions">
+        <div class="ph">
+          <div class="ph-title">Institutions <span class="rpill rpill-a" id="in-pill">Africa</span></div>
+          <div class="ph-actions">
+            <select class="fsel" id="in-sf" onchange="renderInst()">
+              <option value="">All Statuses</option>
+              <option value="prospect">Prospect</option>
+              <option value="active">Active</option>
+              <option value="mou">MOU</option>
+              <option value="contract">Contract</option>
+            </select>
+            <button class="btn btn-p" onclick="openMod('institution')">+ Add</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><div class="card-t">All Institutions & Partners</div></div>
+          <div class="tscroll"><table><thead><tr><th>Name</th><th>Country</th><th>Type</th><th>Status</th><th>Last Contact</th><th></th></tr></thead><tbody id="in-body"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- PIPELINE -->
+      <div class="page" id="page-pipeline">
+        <div class="ph">
+          <div class="ph-title">Pipeline <span class="rpill rpill-a" id="pp-pill">Africa</span></div>
+          <div class="ph-actions">
+            <span class="tx3" id="pp-total" style="font-size:12px"></span>
+            <button class="btn btn-p" onclick="openMod('opportunity')">+ Add</button>
+          </div>
+        </div>
+        <div class="kanban" id="kanban"></div>
+        <div class="card">
+          <div class="card-h"><div class="card-t">All Opportunities</div></div>
+          <div class="tscroll"><table><thead><tr><th>Title</th><th>Institution</th><th>Stage</th><th>Value (€)</th><th>Funding</th><th>Next Action</th><th></th></tr></thead><tbody id="pp-body"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- TODOS -->
+      <div class="page" id="page-todos">
+        <div class="ph">
+          <div class="ph-title">To-Do List</div>
+          <div class="ph-actions">
+            <select class="fsel" id="td-sf" onchange="renderTodos()">
+              <option value="open">Open</option>
+              <option value="done">Done</option>
+              <option value="all">All</option>
+            </select>
+            <select class="fsel" id="td-rf" onchange="renderTodos()">
+              <option value="">All Regions</option>
+              <option value="africa">Africa</option>
+              <option value="me">Middle East</option>
+            </select>
+            <button class="btn btn-o btn-sm" onclick="clearDone()">Clear Done</button>
+            <button class="btn btn-p" onclick="openMod('todo')">+ Add Task</button>
+          </div>
+        </div>
+        <div class="todo-cols" id="todo-cols">
+          <div class="card">
+            <div class="card-h">
+              <div class="card-t"><span class="av av-g">G</span> Gamal's Tasks <span class="nav-cnt" id="cnt-g">0</span></div>
+              <button class="btn btn-p btn-sm" onclick="openMod('todo',{who:'Gamal'})">+</button>
+            </div>
+            <div class="todo-list" id="todos-g"></div>
+          </div>
+          <div class="card">
+            <div class="card-h">
+              <div class="card-t"><span class="av av-a">A</span> Ahmed's Tasks <span class="nav-cnt" id="cnt-a">0</span></div>
+              <button class="btn btn-p btn-sm" onclick="openMod('todo',{who:'Ahmed'})">+</button>
+            </div>
+            <div class="todo-list" id="todos-a"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GOALS -->
+      <div class="page" id="page-goals">
+        <div class="ph">
+          <div class="ph-title">Goals 2026 <span class="rpill rpill-a">Africa + ME</span></div>
+          <div class="ph-actions">
+            <button class="btn btn-o" onclick="openMod('goal')">✎ Edit Goals</button>
+            <button class="btn btn-p" onclick="openMod('priority')">+ Priority</button>
+          </div>
+        </div>
+        <div class="goals-grid" id="goals-grid"></div>
+        <div class="card">
+          <div class="card-h"><div class="card-t">Strategic Priorities</div></div>
+          <div class="tscroll"><table><thead><tr><th>Priority</th><th>Region</th><th>Status</th><th>Notes</th><th></th></tr></thead><tbody id="pr-body"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- TIMELINE -->
+      <div class="page" id="page-timeline">
+        <div class="ph"><div class="ph-title">Activity Timeline</div></div>
+        <div class="card">
+          <div class="card-h"><div class="card-t">Chronological Feed</div></div>
+          <div id="tl-feed"></div>
+        </div>
+      </div>
+
+      <!-- AI -->
+      <div class="page" id="page-ai">
+        <div class="ph"><div class="ph-title">AI Assistant</div></div>
+        <div class="ai-box">
+          <div class="ai-h">
+            <div class="ai-orb">✦</div>
+            <div>
+              <div class="ai-title">BD Assistant <span style="font-size:11px;color:var(--tx3);font-weight:400">· OpenAI</span></div>
+              <div class="ai-sub">Summarize pipeline · check tasks · ask anything about your BD data</div>
+            </div>
+          </div>
+          <div class="ai-body">
+            <div class="ai-key-row">
+              <input type="password" id="ai-key" placeholder="Paste your OpenAI API key (sk-...) to activate" class="fg" style="margin:0">
+              <button class="btn btn-p btn-sm" onclick="activateAI()">Activate</button>
+            </div>
+            <div class="ai-status" id="ai-status">🔒 Add your OpenAI key to unlock the assistant</div>
+            <div class="ai-chat" id="ai-chat">
+              <div class="ai-ph">
+                <div style="font-size:24px;opacity:.4;margin-bottom:8px">✦</div>
+                Try asking: "Summarize Africa pipeline" · "Ahmed's open tasks?" · "2026 goal progress?"
+              </div>
+            </div>
+            <div class="ai-input-row ai-locked" id="ai-input-row">
+              <input type="text" id="ai-prompt" placeholder="Ask anything..." class="fg" style="margin:0" onkeydown="if(event.key==='Enter')sendAI()">
+              <button class="btn btn-p btn-sm" onclick="sendAI()">↑</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div><!-- end app -->
+
+<!-- TOAST -->
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<!-- ══════════ MODALS ══════════ -->
+<div class="overlay" id="m-event">
+  <div class="modal">
+    <div class="modal-h"><div class="modal-title" id="m-ev-title">Add Event</div><button class="modal-x" onclick="closeMod('event')">✕</button></div>
+    <div class="modal-body">
+      <div class="fg"><label>Event Name *</label><input id="e-name" placeholder="e.g. NewSpace Africa 2026"></div>
+      <div class="frow">
+        <div class="fg"><label>Country *</label><input id="e-country" placeholder="e.g. Gabon"></div>
+        <div class="fg"><label>Date *</label><input type="month" id="e-date"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Region</label>
+          <select id="e-region"><option value="africa">Africa</option><option value="me">Middle East</option></select></div>
+        <div class="fg"><label>Role</label>
+          <select id="e-role">
+            <option>Company Representative</option><option>Panelist / Speaker</option>
+            <option>Exhibitor</option><option>Attendee</option><option>Organizer</option>
+          </select></div>
+      </div>
+      <div class="fg"><label>Contacts Made</label><input type="number" id="e-contacts" placeholder="0" min="0"></div>
+      <div class="fg"><label>Notes / Outcomes</label><textarea id="e-notes" placeholder="Key meetings, outcomes, follow-ups..."></textarea></div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-o" onclick="closeMod('event')">Cancel</button><button class="btn btn-p" onclick="saveEvent()">Save Event</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="m-institution">
+  <div class="modal">
+    <div class="modal-h"><div class="modal-title" id="m-in-title">Add Institution</div><button class="modal-x" onclick="closeMod('institution')">✕</button></div>
+    <div class="modal-body">
+      <div class="fg"><label>Name *</label><input id="i-name" placeholder="e.g. Kenya Space Agency"></div>
+      <div class="frow">
+        <div class="fg"><label>Country *</label><input id="i-country" placeholder="e.g. Kenya"></div>
+        <div class="fg"><label>Region</label>
+          <select id="i-region"><option value="africa">Africa</option><option value="me">Middle East</option></select></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Type</label>
+          <select id="i-type"><option>Government Agency</option><option>Research Institute</option><option>Private Company</option><option>Partner</option><option>Client</option><option>Prospect</option></select></div>
+        <div class="fg"><label>Status</label>
+          <select id="i-status"><option value="prospect">Prospect</option><option value="active">Active Engagement</option><option value="mou">MOU Signed</option><option value="contract">Contract</option><option value="cold">Cold</option></select></div>
+      </div>
+      <div class="fg"><label>Key Contact</label><input id="i-contact" placeholder="Name, title"></div>
+      <div class="fg"><label>Last Contact Date</label><input type="date" id="i-lastcontact"></div>
+      <div class="fg"><label>Notes</label><textarea id="i-notes" placeholder="Relationship context, discussions..."></textarea></div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-o" onclick="closeMod('institution')">Cancel</button><button class="btn btn-p" onclick="saveInst()">Save</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="m-opportunity">
+  <div class="modal">
+    <div class="modal-h"><div class="modal-title" id="m-op-title">Add Opportunity</div><button class="modal-x" onclick="closeMod('opportunity')">✕</button></div>
+    <div class="modal-body">
+      <div class="fg"><label>Title *</label><input id="o-name" placeholder="e.g. EO Capacity Building Programme"></div>
+      <div class="frow">
+        <div class="fg"><label>Institution</label><input id="o-inst" placeholder="Client or partner name"></div>
+        <div class="fg"><label>Region</label>
+          <select id="o-region"><option value="africa">Africa</option><option value="me">Middle East</option></select></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Stage</label>
+          <select id="o-stage"><option>Lead</option><option>Qualified</option><option>Proposal</option><option>Negotiation</option><option>Won</option></select></div>
+        <div class="fg"><label>Value (€)</label><input type="number" id="o-value" placeholder="0"></div>
+      </div>
+      <div class="fg"><label>Funding Source</label><input id="o-funding" placeholder="e.g. ESA AESPP, Piano Mattei, EU Horizon..."></div>
+      <div class="fg"><label>Next Action</label><input id="o-next" placeholder="e.g. Send proposal by June 2026"></div>
+      <div class="fg"><label>Notes</label><textarea id="o-notes" placeholder="Context, requirements, stakeholders..."></textarea></div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-o" onclick="closeMod('opportunity')">Cancel</button><button class="btn btn-p" onclick="saveOpp()">Save</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="m-todo">
+  <div class="modal">
+    <div class="modal-h"><div class="modal-title">Add Task</div><button class="modal-x" onclick="closeMod('todo')">✕</button></div>
+    <div class="modal-body">
+      <div class="fg"><label>Task *</label><input id="t-title" placeholder="e.g. Send proposal to Kenya Space Agency"></div>
+      <div class="frow">
+        <div class="fg"><label>Assign To</label>
+          <select id="t-who"><option value="Gamal">Gamal</option><option value="Ahmed">Ahmed</option></select></div>
+        <div class="fg"><label>Priority</label>
+          <select id="t-pri"><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Due Date</label><input type="date" id="t-due"></div>
+        <div class="fg"><label>Region</label>
+          <select id="t-reg"><option value="africa">Africa</option><option value="me">Middle East</option><option value="both">Both</option></select></div>
+      </div>
+      <div class="fg"><label>Notes</label><textarea id="t-notes" placeholder="Details, context, dependencies..."></textarea></div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-o" onclick="closeMod('todo')">Cancel</button><button class="btn btn-p" onclick="saveTodo()">Save Task</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="m-goal">
+  <div class="modal">
+    <div class="modal-h"><div class="modal-title">Edit 2026 Goals</div><button class="modal-x" onclick="closeMod('goal')">✕</button></div>
+    <div class="modal-body" id="goal-fields"></div>
+    <div class="modal-foot"><button class="btn btn-o" onclick="closeMod('goal')">Cancel</button><button class="btn btn-p" onclick="saveGoals()">Save</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="m-priority">
+  <div class="modal">
+    <div class="modal-h"><div class="modal-title">Add Strategic Priority</div><button class="modal-x" onclick="closeMod('priority')">✕</button></div>
+    <div class="modal-body">
+      <div class="fg"><label>Priority *</label><input id="p-name" placeholder="e.g. Open Nairobi branch"></div>
+      <div class="frow">
+        <div class="fg"><label>Region</label>
+          <select id="p-reg"><option>Africa</option><option>Middle East</option><option>Both</option></select></div>
+        <div class="fg"><label>Status</label>
+          <select id="p-status"><option value="active">In Progress</option><option value="prospect">Planned</option><option value="contract">Achieved</option><option value="cold">On Hold</option></select></div>
+      </div>
+      <div class="fg"><label>Notes</label><textarea id="p-notes" placeholder="Details, owners, timeline..."></textarea></div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-o" onclick="closeMod('priority')">Cancel</button><button class="btn btn-p" onclick="savePriority()">Save</button></div>
+  </div>
+</div>
+
+<!-- ══════════ FIREBASE + APP LOGIC ══════════ -->
+<script type="module">
+import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import{getDatabase,ref,onValue,set,update,remove}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+// ── SEED ──
+const SEED={
+  events:[
+    {id:'ev1',region:'africa',name:'NewSpace Africa',country:'Egypt (Cairo)',date:'2025-03',role:'Company Representative',contacts:0,notes:'Represented Planetek. Update with contacts.'},
+    {id:'ev2',region:'africa',name:'Italian Space Day Cairo',country:'Egypt (Cairo)',date:'2025-05',role:'Company Representative',contacts:0,notes:'Italian institutional event.'},
+    {id:'ev3',region:'africa',name:'3rd African Space Leadership Meeting',country:'Kenya (Malindi)',date:'2025-09',role:'Company Representative',contacts:0,notes:'AESPP-related event.'},
+    {id:'ev4',region:'africa',name:'Event in Abidjan',country:"Côte d'Ivoire (Abidjan)",date:'2025-10',role:'Company Representative',contacts:0,notes:'Update event name and outcomes.'},
+    {id:'ev5',region:'africa',name:'GITEX Africa',country:'Morocco (Marrakech)',date:'2026-04',role:'Panelist / Speaker',contacts:0,notes:'Panel on agri-business.'},
+    {id:'ev6',region:'africa',name:'NewSpace Africa 2026',country:'Gabon (Libreville)',date:'2026-05',role:'Company Representative',contacts:0,notes:'Key 2026 event.'},
+    {id:'ev7',region:'me',name:'Global Mineral Forum',country:'Saudi Arabia (Riyadh)',date:'2025-06',role:'Company Representative',contacts:0,notes:'Mining & geospatial.'},
+    {id:'ev8',region:'me',name:'GeoSaudi',country:'Saudi Arabia (Riyadh)',date:'2025-11',role:'Company Representative',contacts:0,notes:'Key ME event.'},
+  ],
+  institutions:[
+    {id:'in1',region:'africa',name:'Kenya Space Agency (KSA)',country:'Kenya',type:'Government Agency',status:'active',contact:'',lastContact:'2025-09-01',notes:'Active engagement post-Malindi.'},
+    {id:'in2',region:'africa',name:'NASDRA',country:'Nigeria',type:'Government Agency',status:'prospect',contact:'',lastContact:'',notes:'Nigerian space agency.'},
+    {id:'in3',region:'africa',name:'SENSAT',country:'Senegal',type:'Government Agency',status:'active',contact:'',lastContact:'2026-04-01',notes:'Strategic meeting April 2026 on NINKI-NANKA.'},
+  ],
+  opportunities:[],
+  todos:{
+    td1:{id:'td1',title:'Follow up with Kenya Space Agency post-Malindi',due:'2026-06-01',priority:'high',who:'Gamal',region:'africa',done:false,notes:'Send capability deck.'},
+    td2:{id:'td2',title:'Update NewSpace Africa Libreville outcomes',due:'2026-06-15',priority:'medium',who:'Ahmed',region:'africa',done:false,notes:'Log contacts made.'},
+    td3:{id:'td3',title:'Prepare SENSAT concept note on IOSL integration',due:'2026-06-30',priority:'high',who:'Gamal',region:'africa',done:false,notes:'Follow-up on April 2026 meeting.'},
+    td4:{id:'td4',title:'Research GeoSaudi follow-up contacts',due:'2026-06-20',priority:'medium',who:'Ahmed',region:'me',done:false,notes:'Identify institutions met at GeoSaudi.'},
+  },
+  goals:{
+    g1:{id:'g1',label:'Contracts Value',target:1000000,current:0,fmt:'currency'},
+    g2:{id:'g2',label:'MOUs Signed',target:3,current:0,fmt:'number'},
+    g3:{id:'g3',label:'Events Attended',target:8,current:0,fmt:'number'},
+    g4:{id:'g4',label:'New Partnerships',target:5,current:0,fmt:'number'},
+  },
+  priorities:{
+    pr1:{id:'pr1',name:'Open Planetek Branch in Nairobi',region:'Africa',status:'active',notes:'Strategic 2026 goal.'},
+    pr2:{id:'pr2',name:'Sign 3 MOUs with African institutions',region:'Africa',status:'active',notes:'Targets: KSA, NASDRA, SENSAT.'},
+    pr3:{id:'pr3',name:'Reach €1M in contracts (Africa + ME)',region:'Both',status:'active',notes:'Combined target.'},
+  }
+};
+
+// ── STATE ──
+let db=null, who='Gamal', region='africa', editId=null, aiKey='', aiMsgs=[];
+let D={events:[],institutions:[],opportunities:[],todos:{},goals:{},priorities:{}};
+
+// ── SETUP ──
+window.pickWho=w=>{
+  who=w;
+  document.querySelectorAll('.who-btn').forEach(b=>{
+    b.className='who-btn'+(b.dataset.w===w?(w==='Gamal'?' on-g':' on-a'):'');
+  });
+};
+
+window.doSetup=()=>{
+  const url=document.getElementById('fb-url').value.trim();
+  const err=document.getElementById('setup-err');
+  if(!who||!url){err.style.display='block';return;}
+  err.style.display='none';
+  localStorage.setItem('ptk_who',who);
+  localStorage.setItem('ptk_fb',url);
+  launch(url);
+};
+
+window.doSkip=()=>{
+  if(!who){document.getElementById('setup-err').style.display='block';return;}
+  localStorage.setItem('ptk_who',who);
+  localStorage.removeItem('ptk_fb');
+  launch(null);
+};
+
+window.switchUser=()=>{
+  if(!confirm('Switch user? Setup screen will reopen.'))return;
+  localStorage.removeItem('ptk_who');
+  location.reload();
+};
+
+function launch(fbUrl){
+  document.getElementById('setup').style.display='none';
+  document.getElementById('app').style.display='flex';
+  document.getElementById('u-who').textContent=who;
+  syncWhoUI();
+  setRegion(region);
+  if(fbUrl){
+    connectFirebase(fbUrl);
+  } else {
+    D={events:[...SEED.events],institutions:[...SEED.institutions],opportunities:[],
+      todos:JSON.parse(JSON.stringify(SEED.todos)),
+      goals:JSON.parse(JSON.stringify(SEED.goals)),
+      priorities:JSON.parse(JSON.stringify(SEED.priorities))};
+    setStatus(false);
+    renderAll();
+  }
+}
+
+function connectFirebase(url){
+  try{
+    const app=initializeApp({databaseURL:url,apiKey:'placeholder',projectId:'placeholder',appId:'placeholder'});
+    db=getDatabase(app);
+    onValue(ref(db,'bd'),snap=>{
+      if(!snap.exists()){
+        set(ref(db,'bd'),SEED).then(()=>toast('✓ Database initialized with seed data'));
+      } else {
+        const d=snap.val();
+        D.events=d.events?(Array.isArray(d.events)?d.events:Object.values(d.events)):[];
+        D.institutions=d.institutions?(Array.isArray(d.institutions)?d.institutions:Object.values(d.institutions)):[];
+        D.opportunities=d.opportunities?(Array.isArray(d.opportunities)?d.opportunities:Object.values(d.opportunities)):[];
+        D.todos=d.todos||{};
+        D.goals=d.goals||SEED.goals;
+        D.priorities=d.priorities||SEED.priorities;
+        setStatus(true);
+        renderAll();
+        flash();
+      }
+    });
+  }catch(e){
+    toast('Firebase error — offline mode');
+    D={events:[...SEED.events],institutions:[...SEED.institutions],opportunities:[],
+      todos:JSON.parse(JSON.stringify(SEED.todos)),
+      goals:JSON.parse(JSON.stringify(SEED.goals)),
+      priorities:JSON.parse(JSON.stringify(SEED.priorities))};
+    setStatus(false);renderAll();
+  }
+}
+
+function setStatus(live){
+  const dot=document.getElementById('u-dot');
+  dot.className='udot '+(live?'live':'off');
+  document.getElementById('sb-status').innerHTML=(live?'<span style="color:var(--green)">●</span> Live · Firebase':'<span style="color:var(--tx3)">●</span> Offline mode');
+}
+
+function flash(){
+  const b=document.getElementById('sync-bar');
+  b.classList.add('go');setTimeout(()=>b.classList.remove('go'),600);
+}
+
+function dbSet(p,v){if(db){set(ref(db,'bd/'+p),v);flash();}}
+function dbUpd(p,v){if(db){update(ref(db,'bd/'+p),v);flash();}}
+function dbDel(p){if(db){remove(ref(db,'bd/'+p));flash();}}
+
+// ── REGION ──
+window.setRegion=r=>{
+  region=r;
+  document.body.setAttribute('data-region',r);
+  document.querySelectorAll('.rsw-b').forEach(b=>b.classList.toggle('on',b.dataset.r===r));
+  const lbl=r==='africa'?'Africa':'Middle East';
+  const pc=r==='africa'?'rpill-a':'rpill-m';
+  ['ov-pill','ev-pill','in-pill','pp-pill'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.className='rpill '+pc;el.textContent=lbl;}
+  });
+  document.getElementById('pr-region').textContent=lbl;
+  ['e-region','i-region','o-region','t-reg'].forEach(id=>{
+    const el=document.getElementById(id);if(el&&el.value!=='both')el.value=r;
+  });
+  renderAll();
+};
+
+// ── NAVIGATION ──
+window.go=id=>{
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('page-'+id)?.classList.add('on');
+  document.querySelectorAll('.nav-btn').forEach(b=>{if(b.getAttribute('onclick')?.includes("'"+id+"'"))b.classList.add('on');});
+  closeSB();renderAll();
+};
+window.toggleSB=()=>{document.getElementById('sidebar').classList.toggle('open');document.getElementById('sb-veil').classList.toggle('on');};
+function closeSB(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sb-veil').classList.remove('on');}
+window.closeSB=closeSB;
+
+// ── RENDER ──
+function renderAll(){renderKPIs();renderOvEv();renderOvIn();renderOvTodos();renderEvents();renderInst();renderPipeline();renderTodos();renderGoals();renderPriorities();renderTimeline();updateCounts();}
+
+// UTILS
+const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function fd(d){if(!d)return'—';if(d.length===7){const[y,m]=d.split('-');return M[+m-1]+' '+y;}if(d.length===10){const[y,m,dy]=d.split('-');return dy+' '+M[+m-1]+' '+y;}return d;}
+function fv(v){if(v>=1e6)return'€'+(v/1e6).toFixed(1)+'M';if(v>=1000)return'€'+Math.round(v/1000)+'K';return v?'€'+v:'€0';}
+function fs(v){if(v>=1e6)return(v/1e6).toFixed(1)+'M';if(v>=1000)return Math.round(v/1000)+'K';return v;}
+function uid(){return'id'+Date.now()+Math.random().toString(36).slice(2,6);}
+function tdArr(){return Object.values(D.todos||{});}
+function glArr(){return Object.values(D.goals||{});}
+function prArr(){return Object.values(D.priorities||{});}
+
+function badge(s){
+  const m={active:['b-green','Active'],prospect:['b-blue','Prospect'],mou:['b-purple','MOU'],contract:['b-africa','Contract'],cold:['b-muted','Cold'],Lead:['b-orange','Lead'],Qualified:['b-blue','Qualified'],Proposal:['b-purple','Proposal'],Negotiation:['b-green','Negotiation'],Won:['b-africa','Won']};
+  const[c,l]=m[s]||['b-muted',s];
+  return`<span class="badge ${c}">${l}</span>`;
+}
+function pbadge(p){const m={high:['b-red','High'],medium:['b-orange','Med'],low:['b-muted','Low']};const[c,l]=m[p]||['b-muted',p];return`<span class="badge ${c}">${l}</span>`;}
+
+function syncWhoUI(){
+  const b=document.getElementById('ov-who-badge');
+  if(b){b.textContent=who;b.className='badge '+(who==='Gamal'?'b-africa':'b-blue');}
+  document.getElementById('u-who').textContent=who;
+}
+
+// KPIs
+function renderKPIs(){
+  const evs=D.events.filter(e=>e.region===region);
+  const ins=D.institutions.filter(i=>i.region===region);
+  const ops=D.opportunities.filter(o=>o.region===region);
+  const won=ops.filter(o=>o.stage==='Won').reduce((s,o)=>s+(+o.value||0),0);
+  const pipe=ops.filter(o=>o.stage!=='Won').reduce((s,o)=>s+(+o.value||0),0);
+  const myT=tdArr().filter(t=>t.who===who&&!t.done);
+  const allOpen=tdArr().filter(t=>!t.done);
+  const countries=[...new Set(evs.map(e=>e.country.split('(')[0].trim()))].length;
+  document.getElementById('kpi-grid').innerHTML=[
+    {ico:'📍',val:evs.length,lbl:'Events',sub:evs.filter(e=>e.date>='2026').length+' in 2026'},
+    {ico:'🏛',val:ins.length,lbl:'Institutions',sub:ins.filter(i=>i.status==='active').length+' active'},
+    {ico:'◈',val:ops.length,lbl:'Opportunities',sub:ops.filter(o=>o.stage==='Won').length+' won'},
+    {ico:'💶',val:fv(won),lbl:'Contracts Won',sub:'€'+fs(pipe)+' pipeline'},
+    {ico:'🤝',val:ins.filter(i=>i.status==='mou').length,lbl:'MOUs Signed',sub:'Target: 3'},
+    {ico:'✓',val:myT.length,lbl:'My Open Tasks',sub:allOpen.length+' total open'},
+    {ico:'👥',val:evs.reduce((s,e)=>s+(+e.contacts||0),0),lbl:'Contacts Made',sub:'Across all events'},
+    {ico:'🌍',val:countries,lbl:'Countries',sub:'Unique countries visited'},
+  ].map(k=>`<div class="kpi"><div class="kpi-ico">${k.ico}</div><div class="kpi-val">${k.val}</div><div class="kpi-lbl">${k.lbl}</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
+}
+
+function renderOvEv(){
+  const evs=D.events.filter(e=>e.region===region).slice(-4).reverse();
+  document.getElementById('ov-ev-body').innerHTML=evs.length
+    ?evs.map(e=>`<tr><td class="fw6 trunc" style="max-width:140px">${e.name}</td><td class="tx3" style="font-size:12px">${e.country}</td><td style="font-size:12px">${fd(e.date)}</td></tr>`).join('')
+    :`<tr><td colspan="3" class="erow">No events yet</td></tr>`;
+}
+function renderOvIn(){
+  const ins=D.institutions.filter(i=>i.region===region);
+  document.getElementById('ov-in-body').innerHTML=ins.length
+    ?ins.map(i=>`<tr><td class="fw6 trunc" style="max-width:140px">${i.name}</td><td style="font-size:12px">${i.country}</td><td>${badge(i.status)}</td></tr>`).join('')
+    :`<tr><td colspan="3" class="erow">No institutions yet</td></tr>`;
+}
+function renderOvTodos(){
+  const todos=tdArr().filter(t=>t.who===who&&!t.done).slice(0,5);
+  document.getElementById('ov-todo-list').innerHTML=todos.length
+    ?todos.map(todoHTML).join('')
+    :`<div style="text-align:center;padding:20px;color:var(--tx3);font-size:13px">No open tasks 🎉</div>`;
+  syncWhoUI();
+}
+
+function renderEvents(){
+  const yr=document.getElementById('ev-yr-f')?.value||'';
+  let evs=D.events.filter(e=>e.region===region);
+  if(yr)evs=evs.filter(e=>e.date?.startsWith(yr));
+  const b=document.getElementById('ev-body');
+  if(!evs.length){b.innerHTML=`<tr><td colspan="7" class="erow">No events yet — click + Add Event</td></tr>`;return;}
+  b.innerHTML=evs.map(e=>`
+    <tr>
+      <td class="fw6">${e.name}</td>
+      <td class="tx3" style="font-size:12px">${e.country}</td>
+      <td style="font-size:12px">${fd(e.date)}</td>
+      <td><span class="badge b-blue" style="font-size:10px">${e.role}</span></td>
+      <td style="text-align:center">${e.contacts||'—'}</td>
+      <td style="max-width:180px;font-size:11px;color:var(--tx3)">${e.notes||'—'}</td>
+      <td><div class="td-act">
+        <button class="btn btn-o btn-ico btn-sm" onclick="editEv('${e.id}')">✎</button>
+        <button class="btn btn-d btn-ico btn-sm" onclick="delEv('${e.id}')">✕</button>
+      </div></td>
+    </tr>`).join('');
+}
+
+function renderInst(){
+  const sf=document.getElementById('in-sf')?.value||'';
+  let ins=D.institutions.filter(i=>i.region===region);
+  if(sf)ins=ins.filter(i=>i.status===sf);
+  const b=document.getElementById('in-body');
+  if(!ins.length){b.innerHTML=`<tr><td colspan="6" class="erow">No institutions yet</td></tr>`;return;}
+  b.innerHTML=ins.map(i=>`
+    <tr>
+      <td class="fw6">${i.name}</td>
+      <td style="font-size:12px">${i.country}</td>
+      <td style="font-size:12px">${i.type}</td>
+      <td>${badge(i.status)}</td>
+      <td style="font-size:12px">${fd(i.lastContact)}</td>
+      <td><div class="td-act">
+        <button class="btn btn-o btn-ico btn-sm" onclick="editIn('${i.id}')">✎</button>
+        <button class="btn btn-d btn-ico btn-sm" onclick="delIn('${i.id}')">✕</button>
+      </div></td>
+    </tr>`).join('');
+}
+
+const STAGES=['Lead','Qualified','Proposal','Negotiation','Won'];
+function renderPipeline(){
+  const ops=D.opportunities.filter(o=>o.region===region);
+  document.getElementById('kanban').innerHTML=STAGES.map(s=>{
+    const cards=ops.filter(o=>o.stage===s);
+    return`<div class="k-col">
+      <div class="k-col-h"><span class="k-stage">${s}</span><span class="k-cnt">${cards.length}</span></div>
+      <div class="k-cards">${cards.length
+        ?cards.map(c=>`<div class="k-card"><div class="k-card-name">${c.name}</div><div class="k-card-inst">${c.inst||''}</div>${c.value?`<div class="k-card-val">€${(+c.value).toLocaleString()}</div>`:''}<div class="k-card-next">${c.next?'→ '+c.next:''}</div></div>`).join('')
+        :'<div style="color:var(--tx3);font-size:11px;padding:4px">Empty</div>'}
+      </div></div>`;
+  }).join('');
+  const total=ops.reduce((s,o)=>s+(+o.value||0),0);
+  document.getElementById('pp-total').textContent=total?'Pipeline: €'+total.toLocaleString():'';
+  const b=document.getElementById('pp-body');
+  if(!ops.length){b.innerHTML=`<tr><td colspan="7" class="erow">No opportunities yet</td></tr>`;return;}
+  b.innerHTML=ops.map(o=>`
+    <tr>
+      <td class="fw6">${o.name}</td>
+      <td style="font-size:12px">${o.inst||'—'}</td>
+      <td>${badge(o.stage)}</td>
+      <td class="fw6">${o.value?'€'+(+o.value).toLocaleString():'—'}</td>
+      <td style="font-size:11px;color:var(--tx2)">${o.funding||'—'}</td>
+      <td style="font-size:12px;color:var(--tx3)">${o.next||'—'}</td>
+      <td><div class="td-act">
+        <button class="btn btn-o btn-ico btn-sm" onclick="editOp('${o.id}')">✎</button>
+        <button class="btn btn-d btn-ico btn-sm" onclick="delOp('${o.id}')">✕</button>
+      </div></td>
+    </tr>`).join('');
+}
+
+function todoHTML(t){
+  const today=new Date().toISOString().slice(0,10),late=t.due&&t.due<today&&!t.done;
+  return`<div class="todo-item">
+    <input type="checkbox" class="tcb" ${t.done?'checked':''} onchange="toggleTodo('${t.id}',this.checked)">
+    <div class="t-body">
+      <div class="t-title${t.done?' done':''}">${t.title}</div>
+      <div class="t-meta">
+        ${t.due?`<span class="t-due${late?' late':''}">${late?'⚠ Overdue: ':'Due: '}${fd(t.due)}</span>`:''}
+        ${pbadge(t.priority)}
+        <span class="badge b-muted" style="font-size:10px">${t.region==='both'?'All':t.region==='africa'?'🌍':'🌙'}</span>
+      </div>
+      ${t.notes?`<div class="t-note">${t.notes}</div>`:''}
+    </div>
+    <div class="t-right"><button class="btn btn-d btn-ico btn-sm" onclick="delTodo('${t.id}')">✕</button></div>
+  </div>`;
+}
+
+function renderTodos(){
+  const sf=document.getElementById('td-sf')?.value||'open';
+  const rf=document.getElementById('td-rf')?.value||'';
+  let todos=tdArr();
+  if(rf)todos=todos.filter(t=>t.region===rf||t.region==='both');
+  if(sf==='open')todos=todos.filter(t=>!t.done);
+  else if(sf==='done')todos=todos.filter(t=>t.done);
+  const gT=todos.filter(t=>t.who==='Gamal'),aT=todos.filter(t=>t.who==='Ahmed');
+  document.getElementById('todos-g').innerHTML=gT.length?gT.map(todoHTML).join(''):`<div style="text-align:center;padding:20px;color:var(--tx3);font-size:12px">All clear 🎉</div>`;
+  document.getElementById('todos-a').innerHTML=aT.length?aT.map(todoHTML).join(''):`<div style="text-align:center;padding:20px;color:var(--tx3);font-size:12px">All clear 🎉</div>`;
+  document.getElementById('cnt-g').textContent=tdArr().filter(t=>t.who==='Gamal'&&!t.done).length;
+  document.getElementById('cnt-a').textContent=tdArr().filter(t=>t.who==='Ahmed'&&!t.done).length;
+}
+
+function renderGoals(){
+  const won=D.opportunities.filter(o=>o.stage==='Won').reduce((s,o)=>s+(+o.value||0),0);
+  const mou=D.institutions.filter(i=>i.status==='mou').length;
+  const evCnt=D.events.length;
+  const part=D.institutions.filter(i=>['active','mou','contract'].includes(i.status)).length;
+  const actuals=[won,mou,evCnt,part];
+  const goals=glArr();
+  document.getElementById('goals-grid').innerHTML=goals.map((g,i)=>{
+    const cur=actuals[i]??g.current,pct=Math.min(100,Math.round((cur/g.target)*100));
+    return`<div class="goal-card">
+      <div class="goal-top">
+        <div class="goal-lbl">${g.label}</div>
+        <div class="goal-nums">
+          <div class="goal-cur">${g.fmt==='currency'?fv(cur):cur}</div>
+          <div class="goal-tgt">${g.fmt==='currency'?'/ '+fv(g.target):'/ '+g.target}</div>
+        </div>
+      </div>
+      <div class="pb"><div class="pbf" style="width:${pct}%"></div></div>
+      <div class="goal-pct">${pct}% of 2026 target</div>
+    </div>`;
+  }).join('');
+  const gf=document.getElementById('goal-fields');
+  if(gf)gf.innerHTML=goals.map(g=>`
+    <div class="frow" style="margin-bottom:12px">
+      <div class="fg"><label>${g.label} — Target</label><input type="number" id="gt-${g.id}" value="${g.target}"></div>
+      <div class="fg"><label>Manual Current</label><input type="number" id="gc-${g.id}" value="${g.current}"></div>
+    </div>`).join('');
+}
+
+function renderPriorities(){
+  const prs=prArr(),b=document.getElementById('pr-body');
+  if(!prs.length){b.innerHTML=`<tr><td colspan="5" class="erow">No priorities yet</td></tr>`;return;}
+  b.innerHTML=prs.map(p=>`
+    <tr>
+      <td class="fw6">${p.name}</td>
+      <td><span class="badge ${p.region==='Africa'?'b-africa':p.region==='Middle East'?'b-me':'b-purple'}">${p.region}</span></td>
+      <td>${badge(p.status)}</td>
+      <td style="font-size:12px;color:var(--tx2)">${p.notes||'—'}</td>
+      <td><button class="btn btn-d btn-ico btn-sm" onclick="delPr('${p.id}')">✕</button></td>
+    </tr>`).join('');
+}
+
+function renderTimeline(){
+  const items=[];
+  D.events.forEach(e=>items.push({date:e.date+'-01',label:'📍 '+e.name,sub:e.country,r:e.region}));
+  D.institutions.forEach(i=>{if(i.lastContact)items.push({date:i.lastContact,label:'🏛 '+i.name,sub:'Last contact · '+i.status,r:i.region});});
+  tdArr().filter(t=>t.done).forEach(t=>items.push({date:new Date().toISOString().slice(0,10),label:'✓ '+t.title,sub:'Done · '+t.who,r:t.region||'africa'}));
+  items.sort((a,b)=>b.date.localeCompare(a.date));
+  const f=document.getElementById('tl-feed');if(!f)return;
+  f.innerHTML=items.slice(0,30).map(it=>`
+    <div class="tl-item">
+      <div class="tl-date">${fd(it.date)}</div>
+      <div class="tl-dot" style="background:${it.r==='africa'?'var(--africa)':'var(--me)'}"></div>
+      <div><div class="tl-name">${it.label}</div><div class="tl-sub">${it.sub}</div></div>
+    </div>`).join('')||`<div style="text-align:center;padding:30px;color:var(--tx3)">No activity yet</div>`;
+}
+
+function updateCounts(){
+  document.getElementById('nc-ev').textContent=D.events.filter(e=>e.region===region).length;
+  document.getElementById('nc-in').textContent=D.institutions.filter(i=>i.region===region).length;
+  document.getElementById('nc-pp').textContent=D.opportunities.filter(o=>o.region===region).length;
+  document.getElementById('nc-td').textContent=tdArr().filter(t=>!t.done).length;
+}
+
+// ── MODALS ──
+window.openMod=(type,opts={})=>{
+  editId=null;
+  if(opts.who)setTimeout(()=>{const el=document.getElementById('t-who');if(el)el.value=opts.who;},30);
+  setTimeout(()=>['e-region','i-region','o-region','t-reg'].forEach(id=>{const el=document.getElementById(id);if(el&&el.value!=='both')el.value=region;}),30);
+  document.getElementById('m-'+type)?.classList.add('on');
+};
+window.closeMod=type=>{document.getElementById('m-'+type)?.classList.remove('on');editId=null;};
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('on');}));
+
+function gv(id){return document.getElementById(id)?.value||'';}
+function sv(id,v){const el=document.getElementById(id);if(el)el.value=v||'';}
+function cv(...ids){ids.forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});}
+
+// ── EVENTS CRUD ──
+window.saveEvent=()=>{
+  const name=gv('e-name').trim();if(!name){alert('Name required');return;}
+  const id=editId||uid();
+  const ev={id,region:gv('e-region'),name,country:gv('e-country').trim(),date:gv('e-date'),role:gv('e-role'),contacts:+gv('e-contacts')||0,notes:gv('e-notes').trim()};
+  if(editId){const i=D.events.findIndex(x=>x.id===editId);if(i>=0)D.events[i]=ev;}else D.events.push(ev);
+  dbSet('events',D.events);closeMod('event');cv('e-name','e-country','e-date','e-contacts','e-notes');
+  document.getElementById('e-role').value='Company Representative';editId=null;renderAll();toast('✓ Event saved');
+};
+window.editEv=id=>{
+  const e=D.events.find(x=>x.id===id);if(!e)return;editId=id;
+  sv('e-name',e.name);sv('e-country',e.country);sv('e-date',e.date);sv('e-region',e.region);sv('e-role',e.role);sv('e-contacts',e.contacts||0);sv('e-notes',e.notes||'');
+  document.getElementById('m-ev-title').textContent='Edit Event';document.getElementById('m-event').classList.add('on');
+};
+window.delEv=id=>{if(!confirm('Delete event?'))return;D.events=D.events.filter(x=>x.id!==id);dbSet('events',D.events);renderAll();toast('Deleted');};
+
+// ── INSTITUTIONS CRUD ──
+window.saveInst=()=>{
+  const name=gv('i-name').trim();if(!name){alert('Name required');return;}
+  const id=editId||uid();
+  const inst={id,region:gv('i-region'),name,country:gv('i-country').trim(),type:gv('i-type'),status:gv('i-status'),contact:gv('i-contact').trim(),lastContact:gv('i-lastcontact'),notes:gv('i-notes').trim()};
+  if(editId){const i=D.institutions.findIndex(x=>x.id===editId);if(i>=0)D.institutions[i]=inst;}else D.institutions.push(inst);
+  dbSet('institutions',D.institutions);closeMod('institution');cv('i-name','i-country','i-contact','i-lastcontact','i-notes');editId=null;renderAll();toast('✓ Institution saved');
+};
+window.editIn=id=>{
+  const i=D.institutions.find(x=>x.id===id);if(!i)return;editId=id;
+  sv('i-name',i.name);sv('i-country',i.country);sv('i-region',i.region);sv('i-type',i.type);sv('i-status',i.status);sv('i-contact',i.contact||'');sv('i-lastcontact',i.lastContact||'');sv('i-notes',i.notes||'');
+  document.getElementById('m-in-title').textContent='Edit Institution';document.getElementById('m-institution').classList.add('on');
+};
+window.delIn=id=>{if(!confirm('Delete?'))return;D.institutions=D.institutions.filter(x=>x.id!==id);dbSet('institutions',D.institutions);renderAll();toast('Deleted');};
+
+// ── OPPORTUNITIES CRUD ──
+window.saveOpp=()=>{
+  const name=gv('o-name').trim();if(!name){alert('Title required');return;}
+  const id=editId||uid();
+  const op={id,region:gv('o-region'),name,inst:gv('o-inst').trim(),stage:gv('o-stage'),value:gv('o-value'),funding:gv('o-funding').trim(),next:gv('o-next').trim(),notes:gv('o-notes').trim()};
+  if(editId){const i=D.opportunities.findIndex(x=>x.id===editId);if(i>=0)D.opportunities[i]=op;}else D.opportunities.push(op);
+  dbSet('opportunities',D.opportunities);closeMod('opportunity');cv('o-name','o-inst','o-value','o-funding','o-next','o-notes');editId=null;renderAll();toast('✓ Opportunity saved');
+};
+window.editOp=id=>{
+  const o=D.opportunities.find(x=>x.id===id);if(!o)return;editId=id;
+  sv('o-name',o.name);sv('o-inst',o.inst||'');sv('o-region',o.region);sv('o-stage',o.stage);sv('o-value',o.value||'');sv('o-funding',o.funding||'');sv('o-next',o.next||'');sv('o-notes',o.notes||'');
+  document.getElementById('m-op-title').textContent='Edit Opportunity';document.getElementById('m-opportunity').classList.add('on');
+};
+window.delOp=id=>{if(!confirm('Delete?'))return;D.opportunities=D.opportunities.filter(x=>x.id!==id);dbSet('opportunities',D.opportunities);renderAll();toast('Deleted');};
+
+// ── TODOS CRUD ──
+window.saveTodo=()=>{
+  const title=gv('t-title').trim();if(!title){alert('Task required');return;}
+  const id=uid();
+  const t={id,title,who:gv('t-who'),priority:gv('t-pri'),due:gv('t-due'),region:gv('t-reg'),notes:gv('t-notes').trim(),done:false};
+  D.todos[id]=t;dbUpd('todos/'+id,t);
+  closeMod('todo');cv('t-title','t-due','t-notes');renderAll();toast('✓ Task added');
+};
+window.toggleTodo=(id,done)=>{if(D.todos[id]){D.todos[id].done=done;dbUpd('todos/'+id,{done});}renderAll();};
+window.delTodo=id=>{if(!confirm('Delete task?'))return;delete D.todos[id];dbDel('todos/'+id);renderAll();toast('Deleted');};
+window.clearDone=()=>{tdArr().filter(t=>t.done).forEach(t=>{delete D.todos[t.id];dbDel('todos/'+t.id);});renderAll();toast('✓ Cleared done tasks');};
+
+// ── GOALS ──
+window.saveGoals=()=>{
+  glArr().forEach(g=>{
+    const t=document.getElementById('gt-'+g.id),c=document.getElementById('gc-'+g.id);
+    if(t)g.target=+t.value||g.target;if(c)g.current=+c.value||0;
+    dbUpd('goals/'+g.id,{target:g.target,current:g.current});
+  });
+  closeMod('goal');renderAll();toast('✓ Goals updated');
+};
+
+// ── PRIORITIES ──
+window.savePriority=()=>{
+  const name=gv('p-name').trim();if(!name){alert('Name required');return;}
+  const id=uid();const p={id,name,region:gv('p-reg'),status:gv('p-status'),notes:gv('p-notes').trim()};
+  D.priorities[id]=p;dbUpd('priorities/'+id,p);
+  closeMod('priority');cv('p-name','p-notes');renderAll();toast('✓ Priority saved');
+};
+window.delPr=id=>{if(!confirm('Delete?'))return;delete D.priorities[id];dbDel('priorities/'+id);renderAll();toast('Deleted');};
+
+// ── EXPORT ──
+window.doExport=()=>{
+  document.querySelectorAll('.page').forEach(p=>{p.classList.remove('print-now','on');});
+  document.getElementById('page-overview').classList.add('print-now','on');
+  document.getElementById('pr-date').textContent='Generated: '+new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})+' · BD: Gamal Abouzied';
+  setTimeout(()=>window.print(),200);toast('↓ Opening print view...');
+};
+
+// ── AI ──
+window.activateAI=()=>{
+  const key=document.getElementById('ai-key').value.trim();
+  if(!key.startsWith('sk-')){alert('Valid OpenAI key required (starts with sk-)');return;}
+  aiKey=key;localStorage.setItem('ptk_ai',key);
+  document.getElementById('ai-status').innerHTML='✅ AI Assistant activated';
+  document.getElementById('ai-input-row').classList.remove('ai-locked');
+  document.getElementById('ai-key').value='';
+  toast('✦ AI activated');
+};
+window.sendAI=async()=>{
+  if(!aiKey){toast('Activate AI first');return;}
+  const prompt=document.getElementById('ai-prompt').value.trim();if(!prompt)return;
+  const chat=document.getElementById('ai-chat');
+  chat.innerHTML+=`<div class="ai-msg u">${prompt}</div>`;
+  document.getElementById('ai-prompt').value='';
+  chat.innerHTML+=`<div class="ai-msg b" id="ai-typing">Thinking...</div>`;
+  chat.scrollTop=chat.scrollHeight;
+  const ctx=`BD assistant for Gamal (manager) and Ahmed at Planetek Italia (Earth Observation, Italy). Africa & ME regions.
+Events Africa: ${D.events.filter(e=>e.region==='africa').map(e=>e.name+' '+e.date).join('; ')||'none'}
+Events ME: ${D.events.filter(e=>e.region==='me').map(e=>e.name+' '+e.date).join('; ')||'none'}
+Institutions Africa: ${D.institutions.filter(i=>i.region==='africa').map(i=>i.name+'['+i.status+']').join('; ')||'none'}
+Institutions ME: ${D.institutions.filter(i=>i.region==='me').map(i=>i.name+'['+i.status+']').join('; ')||'none'}
+Pipeline: ${D.opportunities.map(o=>o.name+'['+o.stage+']€'+o.value).join('; ')||'none'}
+Gamal tasks: ${tdArr().filter(t=>t.who==='Gamal'&&!t.done).map(t=>t.title+(t.due?' due '+t.due:'')).join('; ')||'none'}
+Ahmed tasks: ${tdArr().filter(t=>t.who==='Ahmed'&&!t.done).map(t=>t.title+(t.due?' due '+t.due:'')).join('; ')||'none'}
+2026 Goals: €1M contracts, 3 MOUs, Nairobi branch, 8 events. Be concise and professional.`;
+  aiMsgs.push({role:'user',content:prompt});
+  try{
+    const res=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+aiKey},body:JSON.stringify({model:'gpt-4o-mini',messages:[{role:'system',content:ctx},...aiMsgs],max_tokens:500})});
+    const data=await res.json();
+    if(data.error)throw new Error(data.error.message);
+    const reply=data.choices[0].message.content;
+    aiMsgs.push({role:'assistant',content:reply});
+    document.getElementById('ai-typing').outerHTML=`<div class="ai-msg b">${reply.replace(/\n/g,'<br>')}</div>`;
+    chat.scrollTop=chat.scrollHeight;
+  }catch(e){document.getElementById('ai-typing').outerHTML=`<div class="ai-msg b" style="color:var(--red)">Error: ${e.message}</div>`;}
+};
+
+// ── TOAST ──
+window.toast=msg=>{
+  const w=document.getElementById('toast-wrap');
+  const t=document.createElement('div');t.className='toast';t.textContent=msg;
+  w.appendChild(t);setTimeout(()=>t.remove(),2600);
+};
+
+// ── RESPONSIVE ──
+function checkCols(){const c=document.getElementById('todo-cols');if(c)c.style.gridTemplateColumns=window.innerWidth<640?'1fr':'1fr 1fr';}
+window.addEventListener('resize',checkCols);
+
+// ── INIT ──
+const savedWho=localStorage.getItem('ptk_who');
+const savedFb=localStorage.getItem('ptk_fb');
+const savedAi=localStorage.getItem('ptk_ai');
+if(savedAi){aiKey=savedAi;setTimeout(()=>{const el=document.getElementById('ai-input-row');if(el)el.classList.remove('ai-locked');const st=document.getElementById('ai-status');if(st)st.innerHTML='✅ AI activated';},300);}
+document.getElementById('pr-date').textContent='Generated: '+new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+if(savedWho){who=savedWho;launch(savedFb||null);}
+else{document.getElementById('setup').style.display='flex';}
+checkCols();
+</script>
+</body>
+</html>
